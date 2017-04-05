@@ -19,15 +19,15 @@
     Alloy is a language and tool for relational modelling, and can be found at \url{http://alloy.mit.edu}. This document aims to give a brief and accessible overview of Alloy's syntax and semantics.
 
   \section*{Relations}
-    A \textit{relation} is a subset of the Cartesian product of a series of sets. For example, given the sets $A=\{1, 2, 3\}$ and $B=\{4, 5\}$: $\emptyset$, $\{(1,4), (3, 5)\}$, and $\{(1,4), (2,5), (3,4), (3,5)\}$ are all relations between A and B. The individual elements of a relation, such as $(1,4)$, are called \textit{tuples}. In Alloy's syntax, a relation between two sets is notated using an arrow (\textbf{-\textgreater}), for example a relation between A and B is denoted \lstinline|A->B|. For a single set, a relation is any subset of that set (see below). For more than two sets, the notation just chains, giving \lstinline|A->B->C| for three sets, and so on.\par
-    Alloy represents everything as a relation of some order, which allows for a consistent syntactic approach when dealing with any structure. As a stylistic point, for this guide, types will start with capital letters, and instances of types will start with a lower case letter. Here is the syntax for relation declarations in Alloy.:
+    A \textit{relation} is a subset of the Cartesian product of a series of sets. For example, given the sets $A=\{1, 2, 3\}$ and $B=\{4, 5\}$: $\emptyset$, $\{(1,4), (3, 5)\}$, and $\{(1,4), (2,5), (3,4), (3,5)\}$ are all relations between A and B. The individual elements of a relation, such as $(1,4)$, are called \textit{tuples}. In Alloy's syntax, a relation between two sets is notated using an arrow (\textbf{-\textgreater}), for example a relation between A and B is denoted \lstinline|A->B|. A tuple is denoted \lstinline|a->b|. For a single set, a relation is any subset of that set (see below). For more than two sets, the notation just chains, giving \lstinline|A->B->C| for three sets, and so on.\par
+    Alloy represents everything as a relation of some order, which allows for a consistent syntactic approach. As a stylistic point, for this guide, types will start with capital letters, and instances of types will start with a lower case letter. Here is the syntax for relation declarations in Alloy.:
     \begin{lstlisting}
       boss: Employee -> Employee
       empDesk: Employee -> Office -> Desk
       empDesk1 = e1 -> o1 -> d1 // specific tuples of a type can be
                                 // put in a relation as well, using =
     \end{lstlisting} \par
-    In the above examples, \textit{boss} and \textit{empDesk} are relations between the specified sets, however the tuples in the relation not specified (it could be \textbf{any} valid set of tuples between those two sets). \textit{empDesk1} is a specific relation (of the same type as \textit{empDesk}), containing one tuple, $(e1, o1, d1)$ in mathematical notation, or \lstinline|e1->o1->d1| in Alloy notation. We can specify relations with more than one tuple, using a + to concatenate. For example: \lstinline|rel=a1->b1 + a2->b2|. Note that \textbf{=}, not \textbf{:}, is used to define a relation with specific tuples as opposed to types.\par
+    In the above examples, \textit{boss} and \textit{empDesk} are relations between the specified sets, however the tuples in the relation not specified (it could be \textbf{any} valid set of tuples between those two sets). \textit{empDesk1} is a specific relation (of the same type as \textit{empDesk}), containing one tuple, $(e1, o1, d1)$ in mathematical notation, or \lstinline|e1->o1->d1| in Alloy notation. We can specify relations with more than one tuple, using a + to concatenate. For example: \lstinline|rel=a1->b1 + a2->b2|. Note that \textbf{=} is used to define a relation specifically, in terms of tuples, and \textbf{:} is used to define the type of a relation.\par
     As unary relations, sets are notated differently - by default instead of a relation of arbitrary size, \lstinline|e:Employee| is of size one. The cardinality can be specified as follows:
     \begin{lstlisting}
       e: set Employee // any number of Employees
@@ -45,7 +45,8 @@
                               // it is mapped to each Desk in a set of Desks
     \end{lstlisting} \par
     \subsection*{Dot Joins}
-      A dot join is a binary operation on two relations in Alloy. Given two relations of type \lstinline|R1:A->...->B->C| and \lstinline|R2:C->D->...->E| (in that order), a dot join \lstinline|R1.R2| returns a new relation \lstinline|RDOT:A->...->B->D->...->E|, where a tuple \lstinline|a->...->b->d->...->e| is in \lstinline|RDOT| if \lstinline|r1=a->...->b->c1| is in \lstinline|R1|, \lstinline|r2=c2->d->...->e| is in R2, and \lstinline|c1=c2|. It's important to note that if either \lstinline|R1| or \lstinline|R2| is a unary relation (a set), this is fine; if \lstinline|R2:C| for example, then \lstinline|RDOT: A->B|, where a tuple \lstinline|a->b| is in \lstinline|RDOT| provided the c's are equal for \lstinline|r1| and \lstinline|r2|. For example:
+      A dot join is a binary operation on two relations in Alloy. It takes two relations where the last type of the first is the same as the first type of the second (the "middle types"), and joins them together, removing the middle types, for instances where the middle terms are equal. For example, \lstinline|a->b.a->c| evaluates to \lstinline|a->c|, but \lstinline|a->b1.b2->c| evaluates to \lstinline|none|, as the middle terms differ.\par
+      Formally, given two relations of type \lstinline|R1:A->...->B->C| and \lstinline|R2:C->D->...->E| (in that order), a dot join \lstinline|R1.R2| returns a new relation \lstinline|RDOT:A->...->B->D->...->E|, where a tuple \lstinline|a->...->b->d->...->e| is in \lstinline|RDOT| if \lstinline|r1=a->...->b->c1| is in \lstinline|R1|, \lstinline|r2=c2->d->...->e| is in R2, and \lstinline|c1=c2|. It's important to note that if either \lstinline|R1| or \lstinline|R2| is a unary relation (a set), this is fine; if \lstinline|R2:C| for example, then \lstinline|RDOT: A->B|, where a tuple \lstinline|a->b| is in \lstinline|RDOT| provided the c's are equal for \lstinline|r1| and \lstinline|r2|. For example:
       \begin{lstlisting}
         rel1 = n1->a1 + n2->a2 + n1->a2
         rel2 = a2
@@ -106,7 +107,7 @@
         #(rel2 & rel3) = 1 // true
       \end{lstlisting}\par
     \subsection*{Quantifiers}
-      Alloy supports four quanitifers, examples of their use are given below:
+      Alloy supports five quanitifers, examples of their use are given below:
       \begin{lstlisting}
         no e:Employee | <pred> // no Employees satisfy <pred>
         lone e:Employee | <pred> // at most one Employee satisfies <pred>
@@ -196,7 +197,6 @@
         assert allEmpsHaveOneJob {
           all e:Employee | lone c:Company | e in c.emps
         }
-
         check allEmpsHaveOneJob
       \end{lstlisting}\par
       This assertion checks that all Employees can have at most one job. To check the predicate, the \textbf{check} keyword is used as shown, in an identical way to \textbf{run} statements.
@@ -211,4 +211,59 @@
       Functions must have names, and must declare a return type for the relation, in this case it returns a set containing an arbitrary number of Employees. Oddly, the function above uses double braces, one is for the function body, the other is for the relation comprehension.\par
       It is best to check whether a function definition has worked by using a predicate to check tuples in it and running the predicate.
 
+  \section*{Applications}
+    The flexibility of the language allows many different constructs to be modelled with Alloy. In this section
+    \subsection*{State Changes}
+      Sometimes it is desirable to model an object changing, and it is possible to model such a state changes using predicates. Using the example type definition from earlier:
+      \begin{lstlisting}
+        pred addEmployee[c,c':Company, e:Employee]{
+          c'.emps = c.emps + e
+        }
+      \end{lstlisting}\par
+      This predicate "adds" an Employee \textit{e} to a Company \textit{c}. Except it doesn't quite do this. The \textit{addEmployee} predicate specifies a \textbf{before} and \textbf{after} state (by convention, named the same as the before state with an appended apostrophe) of a Company. This is because when Alloy executes a command, it simply provides a snapshot of a world that obeys the constraints. As such, assignment does not really exist, as there is no timeframe for it to happen in. The goal of state change predicates is to describe the result of an operation on an object in terms of a seperate object. It is important not to think of objects in a world that Alloy generates as existing simultaneously.\par
+      The above predicate has a flaw, in that the \textit{payroll} relation is not specified between the two. This means that the payroll for the two Copmanys could be radically different, despite the fact that that should not change if all that is being added is an Employee. It's also worth noting that the added Employee also needs to be on the left hand side of the payroll relation.\par
+      This last problem can be fixed in one of two ways, either the new Employee's Salary is specified in the predicate, or it is not. The first implementation is referred to as deterministic, the latter is nondeterministic.
+      \begin{lstlisting}
+        pred addEmployee[c,c':Company, e:Employee]{ // non-deterministic
+          c'.emps = c.emps + e
+          all emp:Employee, sal:Salary | emp->sal in c.payroll implies emp->sal in c.payroll
+          all emp:Employee, sal:Salary | emp->sal in c'.payroll implies (emp->sal in c.payroll or emp=e)
+        }
+        pred addEmployee[c,c':Company, e:Employee, s:Salary]{ // deterministic
+          c'.emps = c.emps + e
+          c'.payroll = c.payroll + e->s
+        }
+      \end{lstlisting}\par
+      It is entirely possible that Alloy presents an example where \textit{e} is in \textit{c}, in which case, \textit{c} and \textit{c'} will be the same. It is up to the user to decide whether to explicitly disallow this, and thinking about edge cases such as this is an important skill to develop when using Alloy.\par
+      It is also very possible that \textit{c} is an invalid Company in some way. This is not possible if the validity of a Company is specified in \textbf{facts} and signature constraints, but if any validity specification is in predicates, then \textit{c} may not be a valid Company. It is good practice to write predicates in Alloy as \textbf{honest operations}, that is writing the predicate on the assumption that the before state isvalid, and given that information, be guaranteed to specify an output state that is also valid.
+    \subsection*{Time Modelling}
+      It is possible to model the passage of time in Alloy in several ways. Being a flexible tool, Alloy does not explicitly provide a way to do this, and given the resources provided, there are many possible iplementations of time. In this section, the preferred method will be considering modelling an object as several distinct objects, one for each time "point", and using the \lstinline|util/ordering| module to order them.\par
+      The \lstinline|util/ordering| module can be imported and applied as follows:
+      \begin{lstlisting}
+        open util/ordering[Company]
+      \end{lstlisting}\par
+      This opens the ordering module and applies it to Company. In order to "traverse" the ordering, the module provides several functions:
+      \begin{itemize}
+        \item\textbf{first[]} - returns the first item in the ordering
+        \item\textbf{last[]} - returns the last item in the ordering
+        \item\textbf{next[x]} - returns the item after x in the ordering
+        \item\textbf{prev[x]} - returns the item before x in the ordering
+        \item\textbf{nexts[x]} - returns the set of items after x in the ordering
+        \item\textbf{prevs[x]} - returns the set of items before x in the ordering
+      \end{itemize}\par
+      Now the Company instances are ordered, it is possible to specify (in a fact) that transitions between a Company at one time to the next must be valid.
+      \begin{lstlisting}
+        fact {
+          valid[first[]]
+          all c:Company - last[]
+            | let c' = next[c]
+            | one e:Employee
+            | addEmployee[c,c',e]
+        }
+      \end{lstlisting}\par
+      A few things need explaining here. The \textit{valid[]} predicate should be some user defined predicate that returns true iff the Company is a valid instance. This does not necessarily have to exist, the Company could need to be valid through \textbf{facts} anyway.\par
+      The \textbf{let} keyword has not been shown elsewhere in this primer, as it is only useful in this context. \textbf{let} allows you to alias a variable within a certain scope. In this case, \textit{next[c]} has been aliased to \textit{c'}. The fact as a whole states that each Company except the last (because there is no next Company), must have a valid transition between itself and the next Company. A reminder that while this are different objects, they are being used to represent the same object at different times.
+
+  \section*{Acknowledgments}
+    Thanks go to Russell Boyatt, the author of an Alloy syntax guide (available internally to Warwick students), and Jane Sinclair, who wrote the materials for and lectured the Logic and Verification module at Warwick (CS262).
 \end{document}
