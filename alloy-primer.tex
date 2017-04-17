@@ -262,7 +262,7 @@
         }
       \end{lstlisting}\par
       A few things need explaining here. The \textit{valid[]} predicate should be some user defined predicate that returns true iff the Company is a valid instance. This does not necessarily have to exist, the Company could need to be valid through \textbf{facts} anyway.\par
-      The \textbf{let} keyword has not been shown elsewhere in this primer, as it is only useful in this context. \textbf{let} allows you to alias a variable within a certain scope. In this case, \textit{next[c]} has been aliased to \textit{c'}. The fact as a whole states that each Company except the last (because there is no next Company), must have a valid transition between itself and the next Company. A reminder that while this are different objects, they are being used to represent the same object at different times.
+      The \textbf{let} keyword has not been shown elsewhere in this primer, as it is only useful in this context. \textbf{let} allows you to alias a variable within a certain scope. In this case, \textit{next[c]} has been aliased to \textit{c'}. The fact as a whole states that each Company except the last (because there is no next Company), must have a valid transition between itself and the next Company. A reminder that while these are different objects, they are being used to represent the same object at different times.
 
   \section*{Acknowledgments}
     Thanks go to Russell Boyatt, the author of an Alloy syntax guide (available internally to Warwick students), and Jane Sinclair, who wrote the materials for and lectured the Logic and Verification module at Warwick (CS262).
